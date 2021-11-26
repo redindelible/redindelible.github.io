@@ -138,7 +138,7 @@ class Index(Page, register_name="index"):
             <meta charset="UTF-8">
             <title>redindelible</title>
             <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Shadows+Into+Light&display=swap" rel="stylesheet">
-            <link rel='stylesheet' href='/_site/style.css'>
+            <link rel='stylesheet' href='/style.css'>
         </head>
         <body>
             <div class="top-bar">
