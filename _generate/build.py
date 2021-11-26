@@ -398,7 +398,7 @@ class CodeBlock(Element):
     code_block_pattern = re.compile(r"```(?:@(\S*))?((?:.|\s)*?)(?<!\\)```")
     with_file_format = compact_html("""
         <div class="article-codeblock">
-            <div class="article-codeblock-source">>> {source}</div>
+            <div class="article-codeblock-source">in {source}</div>
             <div class="article-codeblock-code">{code}</div>
         </div>""")
 
