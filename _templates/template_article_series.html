@@ -1,46 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>redindelible</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Shadows+Into+Light&display=swap" rel="stylesheet">
-    <link rel='stylesheet' href='/style.css'>
-    <link rel="icon" href="/favicon.png">
-</head>
-<body>
-    <div class="top-bar">
-        <a class="top-title" href="/index.html">
-            <div>redindelible</div>
-        </a>
-    </div>
-
-    <div class="content">
-        <div class="left-bar">
-            <div class="left-bar-title">
-                {{ article.series_name }}
-            </div>
-            {% for series_article in series %}
+{% extends "template_base.html" %}
+{% block left_bar %}
+    <div class="left-bar">
+        <div class="left-bar-title">
+            {{ article.series_name }}
+        </div>
+        {% for series_article in series %}
             <div class="left-bar-item">
                 <a class="left-bar-item-link" href="{{ series_article.link.as_posix() }}">{{ series_article.number }}. {{ series_article.article_name }}</a>
             </div>
-            {% endfor %}
-        </div>
-        <div class="main-content-container">
-            <div class="main-content">
-                <div class="article-title">
-                    {{ article.title }}
-                </div>
-                <div class="article-subtitle">
-                    Part {{ article.number }} &ndash;  {{ article.article_name }}
-                </div>
-                <div class="article-date">
-                    Published {{ article.date.strftime("%b %d, %Y") }}
-                </div>
-                {% for element in article.elements %}
-                {{ element.render(templates, site) }}
-                {% endfor %}
-            </div>
-        </div>
+        {% endfor %}
     </div>
-</body>
-</html>
+{% endblock %}
+{% block content %}
+    <div class="article-title">
+        {{ article.title }}
+    </div>
+    <div class="article-subtitle">
+        Part {{ article.number }} &ndash;  {{ article.article_name }}
+    </div>
+    <div class="article-date">
+        Published {{ article.date.strftime("%b %d, %Y") }}
+    </div>
+    {% for element in article.elements %}
+        {{ element.render(templates, site) }}
+    {% endfor %}
+{% endblock %}}

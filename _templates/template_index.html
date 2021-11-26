@@ -1,44 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>redindelible</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Shadows+Into+Light&display=swap" rel="stylesheet">
-    <link rel='stylesheet' href='/style.css'>
-    <link rel="icon" href="/favicon.png">
-</head>
-<body>
-    <div class="top-bar">
-        <a class="top-title" href="/index.html">
-            <div>redindelible</div>
-        </a>
-    </div>
-
-    <div class="content">
-        <div class="main-content-container">
-            <div class="main-content">
-                {% for article in articles %}
-                <div class="article-card-container">
-                    <div class="article-card">
-                        <div class="article-card-link">
-                            {% if article.type == "article-series" %}
-                            <a href="{{ article.link.as_posix() }}">{{ article.title }} / Part {{ article.number }} &ndash; {{ article.article_name }}</a>
-                            {% else %}
-                            <a href="{{ article.link.as_posix() }}">{{ article.title }}</a>
-                            {% endif %}
-                        </div>
-                        <div class="article-card-info">
-                            {{ article.date.strftime("%b %d, %Y") }}
-                        </div>
-                        <div class="article-card-preview">
-                            {{ article.preview }}...
-                        </div>
-                    </div>
+{% extends "template_base.html" %}
+{% block content %}
+    {% for article in articles %}
+        <div class="article-card-container">
+            <div class="article-card">
+                <div class="article-card-link">
+                    {% if article.type == "article-series" %}
+                        <a href="{{ article.link.as_posix() }}">{{ article.title }} / Part {{ article.number }} &ndash; {{ article.article_name }}</a>
+                    {% else %}
+                        <a href="{{ article.link.as_posix() }}">{{ article.title }}</a>
+                    {% endif %}
                 </div>
-                {% endfor %}
-                <div class="article-card-end"></div>
+                <div class="article-card-info">
+                    {{ article.date.strftime("%b %d, %Y") }}
+                </div>
+                <div class="article-card-preview">
+                    {{ article.preview }}...
+                </div>
             </div>
         </div>
-    </div>
-</body>
-</html>
+    {% endfor %}
+    <div class="article-card-end"></div>
+{% endblock %}

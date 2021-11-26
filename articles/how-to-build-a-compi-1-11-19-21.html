@@ -15,41 +15,41 @@
     </div>
 
     <div class="content">
-        <div class="left-bar">
-            <div class="left-bar-title">
-                How To Build a Compiler
-            </div>
+    <div class="left-bar">
+        <div class="left-bar-title">
+            How To Build a Compiler
+        </div>
             <div class="left-bar-item">
                 <a class="left-bar-item-link" href="/articles/how-to-build-a-compi-1-11-19-21.html">1. Introduction</a>
             </div>
-        </div>
+    </div>
         <div class="main-content-container">
             <div class="main-content">
-                <div class="article-title">
-                    How To Build a Compiler
-                </div>
-                <div class="article-subtitle">
-                    Part 1 &ndash;  Introduction
-                </div>
-                <div class="article-date">
-                    Published Nov 19, 2021
-                </div>
-                <div class="article-paragraph">This article is intended to be the first of a series of articles that will walk you through coding a compiler, and providing you with a thorough understanding of the functioning of that code. By the end, you will hopefully both have a functioning compiler on hand, and have knowledge of how to extend it with your own ideas.</div>
-                <div class="article-paragraph">First off, a few crucial distinction: A programming language is fundamentally distinct from an implementation of a programming language. A programming language is nothing more than a specification of the behavior that a given text will have.<input type="checkbox" class="article-note-input" id="article-note-1"><span class="article-note"><label class="article-note-label" for="article-note-1"><span class="article-note-button">Note</span></label>
+    <div class="article-title">
+        How To Build a Compiler
+    </div>
+    <div class="article-subtitle">
+        Part 1 &ndash;  Introduction
+    </div>
+    <div class="article-date">
+        Published Nov 19, 2021
+    </div>
+        <div class="article-paragraph">This article is intended to be the first of a series of articles that will walk you through coding a compiler, and providing you with a thorough understanding of the functioning of that code. By the end, you will hopefully both have a functioning compiler on hand, and have knowledge of how to extend it with your own ideas.</div>
+        <div class="article-paragraph">First off, a few crucial distinction: A programming language is fundamentally distinct from an implementation of a programming language. A programming language is nothing more than a specification of the behavior that a given text will have.<input type="checkbox" class="article-note-input" id="article-note-1"><span class="article-note"><label class="article-note-label" for="article-note-1"><span class="article-note-button">Note</span></label>
     <span class="article-note-text-container">
         <span class="article-note-text">Technically, the program doesn't have to be text. The  program could be something like bits or a visual program. The programming language just has to describe  what that representation means in terms of behavior.</span>
     </span>
 </span> An implementation, on the other hand, is the  specific program that actually executes said behavior. There may be multiple different implementations of  a particular programming language, but (ideally) they will all have the same end result for the same program.</div>
-                <div class="article-paragraph">A few languages confuse this difference. Python, for example, has one major implementation in CPython, which defines Python better than its spec does. Other Python implementations, such as PyPy or IronPython, struggle  because they cannot leverage the C Libraries like numpy which have been coded to rely on CPython implementation details. </div>
-                <div class="article-paragraph">On the other hand, C does very well in separating its specification and its implementation. A new C specification comes out every once in a while (ANSI C, C99, C11, etc.), and every C implementation does its best to meet a  particular version of C's specification. GCC and Clang typically aim to implement everything in the latest version,  while MSVC was stuck on ANSI C for a very long time.  </div>
-                <div class="article-paragraph">The options for implementing a programming language boil down to either making a custom chip which implements a  programming language, or translating code from that language down to Machine Code so that it can run on a general  chip. Given that the first option is very difficult and inefficient, virtually everyone chooses to go for the second option, either directly or indirectly. Most C implementations take code written in C and translate that to your processor's Machine Code. Meanwhile, CPython translates Python to C, and then translates C to Machine  code.<input type="checkbox" class="article-note-input" id="article-note-2"><span class="article-note"><label class="article-note-label" for="article-note-2"><span class="article-note-button">Note</span></label>
+        <div class="article-paragraph">A few languages confuse this difference. Python, for example, has one major implementation in CPython, which defines Python better than its spec does. Other Python implementations, such as PyPy or IronPython, struggle  because they cannot leverage the C Libraries like numpy which have been coded to rely on CPython implementation details. </div>
+        <div class="article-paragraph">On the other hand, C does very well in separating its specification and its implementation. A new C specification comes out every once in a while (ANSI C, C99, C11, etc.), and every C implementation does its best to meet a  particular version of C's specification. GCC and Clang typically aim to implement everything in the latest version,  while MSVC was stuck on ANSI C for a very long time.  </div>
+        <div class="article-paragraph">The options for implementing a programming language boil down to either making a custom chip which implements a  programming language, or translating code from that language down to Machine Code so that it can run on a general  chip. Given that the first option is very difficult and inefficient, virtually everyone chooses to go for the second option, either directly or indirectly. Most C implementations take code written in C and translate that to your processor's Machine Code. Meanwhile, CPython translates Python to C, and then translates C to Machine  code.<input type="checkbox" class="article-note-input" id="article-note-2"><span class="article-note"><label class="article-note-label" for="article-note-2"><span class="article-note-button">Note</span></label>
     <span class="article-note-text-container">
         <span class="article-note-text">The actual order this happens in is the other way around. We'll get to interpreters shortly.</span>
     </span>
 </span></div>
-                <div class="article-paragraph">A compiler, in its most general sense, is a program which translates code from one programming language to another, and is therefore the most common way of implementing programming languages. Anyone who took the second path I mentioned above wrote a compiler. However, even though this definition of a compiler is nice and short, it isn't particularly  useful. A compiler which translates C to Machine Code is going to look very different from a compiler that translates Python to C. And even within translating Python to C, there are two very distinct ways to do so. Therefore, compilers are divided into 4 distinct types.  </div>
-                <div class="article-paragraph">Interpreters</div>
-                <div class="article-codeblock">
+        <div class="article-paragraph">A compiler, in its most general sense, is a program which translates code from one programming language to another, and is therefore the most common way of implementing programming languages. Anyone who took the second path I mentioned above wrote a compiler. However, even though this definition of a compiler is nice and short, it isn't particularly  useful. A compiler which translates C to Machine Code is going to look very different from a compiler that translates Python to C. And even within translating Python to C, there are two very distinct ways to do so. Therefore, compilers are divided into 4 distinct types.  </div>
+        <div class="article-paragraph">Interpreters</div>
+        <div class="article-codeblock">
     <div class="article-codeblock-source">in main.py</div>
     <div class="article-codeblock-code">def fibo(n):
     if n < 2:
