@@ -418,8 +418,8 @@ class CodeBlock(Element):
 
 def main():
     parser = argparse.ArgumentParser(description="Generate a website from source markdown files")
-    parser.add_argument("source", type=Path)
-    parser.add_argument("dest", type=Path)
+    parser.add_argument("source", type=Path, help="directory to copy and generate from")
+    parser.add_argument("dest", type=Path, help="directory to copy and generate to")
     args = parser.parse_args()
     generator = Generator(args.source, args.dest)
     generator.render()
