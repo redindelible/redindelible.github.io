@@ -33,6 +33,11 @@ body {
     font-weight: bold;
 }
 
+.bottom-bar {
+    height: 100px;
+    background-color: var(--main-background-color);
+}
+
 .content {
     padding-top: 7vh;
 }
