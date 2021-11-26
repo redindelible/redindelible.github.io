@@ -16,19 +16,25 @@
     <div class="content">
         <div class="main-content-container">
             <div class="main-content">
+                {% for article in articles %}
                 <div class="article-card-container">
                     <div class="article-card">
                         <div class="article-card-link">
-                            <a href="/articles/how-to-build-a-compi-1-11-19-21.html">How To Build a Compiler / Part 1 &ndash; Introduction</a>
+                            {% if article.type == "article-series" %}
+                            <a href="{{ article.link.as_posix() }}">{{ article.title }} / Part {{ article.number }} &ndash; {{ article.article_name }}</a>
+                            {% else %}
+                            <a href="{{ article.link.as_posix() }}">{{ article.title }}</a>
+                            {% endif %}
                         </div>
                         <div class="article-card-info">
-                            Nov 19, 2021
+                            {{ article.date.strftime("%b %d, %Y") }}
                         </div>
                         <div class="article-card-preview">
-                            This article is intended to be the first of a series of articles that will walk you through coding a compiler, and providing you with a thorough understanding of the functioning of that code. By the end, you will hopefully both have a functioning compiler on hand, and have knowledge of how to extend...
+                            {{ article.preview }}...
                         </div>
                     </div>
                 </div>
+                {% endfor %}
                 <div class="article-card-end"></div>
             </div>
         </div>

@@ -7,18 +7,30 @@ from datetime import datetime
 from pathlib import Path
 from typing import Type
 
+import jinja2
 
-def compact_html(s: str) -> str:
-    return "".join(line.strip() for line in s.splitlines())
+
+class Templates:
+    def __init__(self, dir: Path):
+        self.dir = dir
+        self.env = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(dir),
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
+
+    def load(self, name: str) -> jinja2.Template:
+        return self.env.get_template(f"{name}.html")
 
 
 class Generator:
     METADATA_PATTERN = re.compile(r"^%({(?:.|\s)*?})%")
 
-    def __init__(self, source_dir: Path, target_dir: Path):
-        self.source_dir: source_dir = source_dir
+    def __init__(self, source_dir: Path, templates_dir: Path, target_dir: Path):
+        self.source_dir: Path = source_dir
         self.target_dir: Path = target_dir
 
+        self.templates: Templates = Templates(templates_dir)
         self.site: Site = Site()
         for page in self.parse_dir(self.source_dir):
             self.site.add_page(page)
@@ -65,7 +77,7 @@ class Generator:
 
         copy_tree(self.source_dir, self.target_dir)
 
-        self.site.render(self.target_dir)
+        self.site.render(self.templates, self.target_dir)
 
 
 class Site:
@@ -84,11 +96,11 @@ class Site:
         self.counter += 1
         return self.counter
 
-    def render(self, target: Path):
+    def render(self, templates: Templates, target: Path):
         for page in self.pages:
-            page_path = Path(str(target) + str(page.link()))
+            page_path = Path(str(target) + str(page.link))
             page_path.parent.mkdir(parents=True, exist_ok=True)
-            page_path.write_text(page.render(self))
+            page_path.write_text(page.render(templates, self))
 
 
 class Page:
@@ -98,6 +110,10 @@ class Page:
         if register_name is None:
             raise Exception()
         Page.page_types[register_name] = cls
+        cls._page_type = register_name
+
+    def __init__(self):
+        self.type = self._page_type
 
     @classmethod
     def create(cls, metadata: dict, text: str):
@@ -107,118 +123,47 @@ class Page:
     def _create(cls, metadata: dict, text: str) -> Page:
         raise NotImplementedError()
 
+    @property
     def link(self) -> Path:
         raise NotImplementedError()
 
-    def render(self, site: Site) -> str:
+    def render(self, templates: Templates, site: Site) -> str:
         raise NotImplementedError()
 
 
 class Index(Page, register_name="index"):
-    card_format = compact_html("""
-        <div class="article-card-container">
-            <div class="article-card">
-                <div class="article-card-link">
-                    <a href="{link}">{name}</a>
-                </div>
-                <div class="article-card-info">
-                    {date}
-                </div>
-                <div class="article-card-preview">
-                    {preview}...
-                </div>
-            </div>
-        </div>
-    """)
-
-    format = compact_html("""
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <title>redindelible</title>
-            <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Shadows+Into+Light&display=swap" rel="stylesheet">
-            <link rel='stylesheet' href='/style.css'>
-        </head>
-        <body>
-            <div class="top-bar">
-                <a class="top-title" href="/index.html">
-                    <div>redindelible</div>
-                </a>
-            </div>
-            
-            <div class="content">
-                <div class="main-content-container">
-                    <div class="main-content">
-                        {rendered_cards}
-                        <div class="article-card-end"></div>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
-    """)
-
     def __init__(self):
-        pass
+        super().__init__()
 
     @classmethod
     def _create(cls, metadata: dict, text: str) -> Page:
         return Index()
 
+    @property
     def link(self) -> Path:
         return Path("/index.html")
 
-    def render(self, site: Site) -> str:
-        cards = []
-        for article in sorted((page for page in site.pages if isinstance(page, Article)), key=lambda art: art.date, reverse=True):
-            if isinstance(article, ArticleSeries):
-                name = f"{article.title} / Part {article.number} &ndash; {article.article_name}"
-            else:
-                name = article.title
-            cards.append(self.card_format.format(link=article.link(), name=name, date=article.date.strftime("%b %d, %Y"), preview=article.preview()))
-        return self.format.format(rendered_cards="".join(cards))
+    def render(self, templates: Templates, site: Site) -> str:
+        # cards = []
+        #
+        # for article in sorted((page for page in site.pages if isinstance(page, Article)), key=lambda art: art.date, reverse=True):
+        #     if isinstance(article, ArticleSeries):
+        #         name = f"{article.title} / Part {article.number} &ndash; {article.article_name}"
+        #     else:
+        #         name = article.title
+        #     cards.append(self.card_format.format(link=article.link, name=name, date=article.date.strftime("%b %d, %Y"), preview=article.preview()))
+        articles = sorted((page for page in site.pages if isinstance(page, Article)), key=lambda art: art.date, reverse=True)
+        return templates.load("template_index").render(articles=articles)
 
 
 class Article(Page, register_name="article"):
-    format = compact_html("""
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <title>redindelible</title>
-            <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Shadows+Into+Light&display=swap" rel="stylesheet">
-            <link rel='stylesheet' href='/style.css'>
-            <link rel="icon" href="/favicon.png">
-        </head>
-        <body>
-            <div class="top-bar">
-                <a class="top-title" href="/index.html">
-                    <div>redindelible</div>
-                </a>
-            </div>
-            <div class="content">
-                <div class="main-content-container">
-                    <div class="main-content">
-                        <div class="article-title">
-                            {title}
-                        </div>
-                        <div class="article-date">
-                            Published {date}
-                        </div>
-                        {rendered_content}
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
-    """)
-
     def __init__(self, title: str, date: datetime, elements: list[Element]):
+        super().__init__()
         self.title: str = title
         self.date: datetime = date
         self.elements = elements
 
+    @property
     def link(self):
         return Path(f"/articles/{self.title[:20].strip().lower().replace(' ', '-')}-{self.date.strftime('%m-%d-%y')}.html")
 
@@ -260,6 +205,7 @@ class Article(Page, register_name="article"):
                 elements.append(Paragraph(paragraph_text.replace("\n", " ")))
         return elements
 
+    @property
     def preview(self) -> str:
         for element in self.elements:
             if isinstance(element, Paragraph):
@@ -267,61 +213,11 @@ class Article(Page, register_name="article"):
         else:
             return ""
 
-    def render(self, site: Site) -> str:
-        return self.format.format(title=self.title, date=self.date.strftime("%b %d, %Y"),
-                           rendered_content="".join(element.render(site) for element in self.elements))
+    def render(self, templates: Templates, site: Site) -> str:
+        return templates.load("template_article").render(article=self, templates=templates, site=site)
 
 
 class ArticleSeries(Article, register_name="article-series"):
-    left_link_format = compact_html("""
-        <div class="left-bar-item">
-            <a class="left-bar-item-link" href="{link}">{number}. {article_name}</a>
-        </div>
-    """)
-
-    format = compact_html("""
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <title>redindelible</title>
-            <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Shadows+Into+Light&display=swap" rel="stylesheet">
-            <link rel='stylesheet' href='/style.css'>
-            <link rel="icon" href="/favicon.png">
-        </head>
-        <body>
-            <div class="top-bar">
-                <a class="top-title" href="/index.html">
-                    <div>redindelible</div>
-                </a>
-            </div>
-            
-            <div class="content">
-                <div class="left-bar">
-                    <div class="left-bar-title">
-                        {series_name}
-                    </div>
-                    {rendered_left_links}
-                </div>
-                <div class="main-content-container">
-                    <div class="main-content">
-                        <div class="article-title">
-                            {title}
-                        </div>
-                        <div class="article-subtitle">
-                            Part {number} &ndash; {article_name}
-                        </div>
-                        <div class="article-date">
-                            Published {date}
-                        </div>
-                        {rendered_content}
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
-    """)
-
     def __init__(self, title: str, date: datetime, series_name: str, article_name: str, number: int, elements: list[Element]):
         super().__init__(title, date, elements)
         self.series_name: str = series_name
@@ -338,21 +234,17 @@ class ArticleSeries(Article, register_name="article-series"):
         number = metadata["series"]["number"]
         return ArticleSeries(title, date, series_name, article_name, number, elements)
 
+    @property
     def link(self):
         return Path(f"/articles/{self.title[:20].strip().lower().replace(' ', '-')}-{self.number}-{self.date.strftime('%m-%d-%y')}.html")
 
-    def render(self, site: Site) -> str:
-        left_links = []
-        for article in sorted(site.all_series[self.series_name], key=lambda art: art.number):
-            left_link = self.left_link_format.format(number=article.number, article_name=article.article_name, link=article.link())
-            left_links.append(left_link)
-        return self.format.format(title=self.title, date=self.date.strftime("%b %d, %Y"), number=self.number,
-                                  article_name=self.article_name, series_name=self.series_name, rendered_left_links="".join(left_links),
-                                  rendered_content="".join(element.render(site) for element in self.elements))
+    def render(self, templates: Templates, site: Site) -> str:
+        series = sorted(site.all_series[self.series_name], key=lambda art: art.number)
+        return templates.load("template_article_series").render(article=self, series=series, templates=templates, site=site)
 
 
 class Element:
-    def render(self, site: Site) -> str:
+    def render(self, templates: Templates, site: Site) -> str:
         raise NotImplementedError()
 
 
@@ -361,46 +253,25 @@ class Paragraph(Element):
     note_pattern = re.compile(r"(?<!\\)`@note (.*?)(?<!\\)`")
     inline_code_pattern = re.compile(r"(?<!\\)`(.*?)(?<!\\)`")
 
-    format = compact_html("""
-        <div class="article-paragraph">{text}</div>
-    """)
-    note_format = compact_html(r"""
-        <input type="checkbox" class="article-note-input" id="article-note-{number}">
-        <span class="article-note">
-            <label class="article-note-label" for="article-note-{number}">
-                <span class="article-note-button">Note</span>
-            </label>
-            <span class="article-note-text-container">
-                <span class="article-note-text">{note}</span>
-            </span>
-        </span>
-    """)
-    inline_code_format = compact_html(r"""
-        <span class="article-inline-code">{code}</span>
-    """)
-
     def __init__(self, raw_text: str):
         self.raw_text = raw_text
 
     def __repr__(self):
         return f"Paragraph({self.raw_text!r})"
 
-    def render(self, site: Site) -> str:
+    def render(self, templates: Templates, site: Site) -> str:
         text = self.raw_text
         while match := self.note_pattern.search(text):
-            text = text[:match.start()] + self.note_format.format(number=site.next_number(), note=match.group(1)) + text[match.end():]
+            note = templates.load("template_note").render(number=site.next_number(), note=match.group(1))
+            text = text[:match.start()] + note + text[match.end():]
         while match := self.inline_code_pattern.search(text):
-            text = text[:match.start()] + self.inline_code_format.format(code=match.group(1)) + text[match.end():]
-        return self.format.format(text=text)
+            code = templates.load("template_inline_code").render(code=match.group(1))
+            text = text[:match.start()] + code + text[match.end():]
+        return templates.load("template_paragraph").render(text=text)
 
 
 class CodeBlock(Element):
     code_block_pattern = re.compile(r"```(?:@(\S*))?((?:.|\s)*?)(?<!\\)```")
-    with_file_format = compact_html("""
-        <div class="article-codeblock">
-            <div class="article-codeblock-source">in {source}</div>
-            <div class="article-codeblock-code">{code}</div>
-        </div>""")
 
     def __init__(self, file: str | None, raw_code: str):
         self.file = file
@@ -409,19 +280,17 @@ class CodeBlock(Element):
     def __repr__(self):
         return f"CodeBlock({self.raw_code!r})"
 
-    def render(self, site: Site) -> str:
-        if self.file is None:
-            raise Exception()
-        else:
-            return self.with_file_format.format(source=self.file, code=self.raw_code)
+    def render(self, templates: Templates, site: Site) -> str:
+        return templates.load("template_code_block").render(source=self.file, code=self.raw_code)
 
 
 def main():
     parser = argparse.ArgumentParser(description="Generate a website from source markdown files")
     parser.add_argument("source", type=Path, help="directory to copy and generate from")
+    parser.add_argument("templates", type=Path, help="directory with template files")
     parser.add_argument("dest", type=Path, help="directory to copy and generate to")
     args = parser.parse_args()
-    generator = Generator(args.source, args.dest)
+    generator = Generator(args.source, args.templates, args.dest)
     generator.render()
 
 
