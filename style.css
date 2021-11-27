@@ -110,6 +110,13 @@ body {
     padding-bottom: 5px;
 }
 
+.article-heading-1 {
+    color: var(--text-color);
+    font-family: Roboto, sans-serif;
+    font-size: 25px;
+    padding: 25px 0 5px;
+}
+
 .article-paragraph {
     color: var(--text-color);
     font-family: Roboto, sans-serif;

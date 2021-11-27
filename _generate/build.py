@@ -144,14 +144,6 @@ class Index(Page, register_name="index"):
         return Path("/index.html")
 
     def render(self, templates: Templates, site: Site) -> str:
-        # cards = []
-        #
-        # for article in sorted((page for page in site.pages if isinstance(page, Article)), key=lambda art: art.date, reverse=True):
-        #     if isinstance(article, ArticleSeries):
-        #         name = f"{article.title} / Part {article.number} &ndash; {article.article_name}"
-        #     else:
-        #         name = article.title
-        #     cards.append(self.card_format.format(link=article.link, name=name, date=article.date.strftime("%b %d, %Y"), preview=article.preview()))
         articles = sorted((page for page in site.pages if isinstance(page, Article)), key=lambda art: art.date, reverse=True)
         return templates.load("template_index").render(articles=articles)
 
@@ -183,6 +175,14 @@ class Article(Page, register_name="article"):
             if text.startswith("```", i):
                 if match := CodeBlock.code_block_pattern.match(text, i):
                     elements.append(CodeBlock(match.group(1), match.group(2).strip()))
+                    i = match.end()
+                    while i < len(text) and text[i] in " \t\n\r":
+                        i += 1
+                else:
+                    raise Exception()
+            elif text.startswith("#", i):
+                if match := Heading.heading_pattern.match(text, i):
+                    elements.append(Heading(len(match.group(1)), match.group(2).strip()))
                     i = match.end()
                     while i < len(text) and text[i] in " \t\n\r":
                         i += 1
@@ -246,6 +246,17 @@ class ArticleSeries(Article, register_name="article-series"):
 class Element:
     def render(self, templates: Templates, site: Site) -> str:
         raise NotImplementedError()
+
+
+class Heading(Element):
+    heading_pattern = re.compile(r"(#)([^#\n]*)")
+
+    def __init__(self, level: int, heading: str):
+        self.level = level
+        self.heading = heading
+
+    def render(self, templates: Templates, site: Site) -> str:
+        return templates.load("template_heading").render(level=self.level, heading=self.heading)
 
 
 class Paragraph(Element):
