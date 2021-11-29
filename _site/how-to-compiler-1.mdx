@@ -1,7 +1,7 @@
 %{
     "type": "article-series",
     "title": "How To Build a Compiler",
-    "date": "Nov 19, 2021",
+    "date": "Nov 28, 2021",
     "series": {
         "series_name": "How To Build a Compiler",
         "article_name": "Introduction",
@@ -34,6 +34,8 @@ comes out every once in a while (ANSI C, C99, C11, etc.), and every C implementa
 particular version of C's specification. GCC and Clang typically aim to implement everything in the latest version, 
 while MSVC was stuck on ANSI C for a very long time.  
 
+# The Compiler
+
 The options for implementing a programming language boil down to either making a custom chip which implements a 
 programming language, or translating code from that language down to Machine Code so that it can run on a general 
 chip. Given that the first option is very difficult and inefficient, virtually everyone chooses to go for the
@@ -48,12 +50,54 @@ useful. A compiler which translates C to Machine Code is going to look very diff
 Python to C. And even within translating Python to C, there are two very distinct ways to do so. Therefore, compilers
 are divided into 4 distinct types.  
 
-Interpreters
+# Types of Compilers
 
-```@main.py
-def fibo(n):
-    if n < 2:
-        return n
-    else:
-        return fibo(n-1) + fibo(n-2)
-```
+A traditional compiler specifically refers to a program that takes a program in a particular programming language and 
+outputs a program in machine code. Thus, programs such as gcc, clang, or rustc are what are called "compilers". 
+Compilers have a well-deserved reputation for producing performant results, since it isn't possible to be faster than 
+machine code, and since all the work of translation is done before the resulting program is actually run.
+
+A transpiler is a more general version of the aforementioned type of compiler. Instead of outputting machine code,
+it instead outputs code in another (relatively) high-level language. There aren't very many examples of transpilers,
+since the input and output languages have to be very close in semantics in order to get any benefit in writing 
+one.`@note Naturally, any Turing-complete language can be implemented in any other Turing-complete language. However,
+if the semantics of the two languages are too different, then we can't translate equivalent concepts in one language to another.
+For example, in a C to Python transpiler, how do you implement pointer manipulation? Your only option would be to simulate
+an entire computer from the bit-level up in order to properly capture C's semantics, which is obviously not useful.`
+Early C++ implementations were transpilers which outputted C code (the addition of exceptions prompted C++ implementations
+to become traditional compilers). More recently, Typescript is implemented as a transpiled language to JavaScript. Both early C++
+and TypeScript are very close in semantics to their host languages of C and JavaScript, respectively, so transpilers could
+be written.
+
+Interpreters take code in one language, and execute it on the fly within another language. In a sense, they are similar to
+transpilers in that they use an intermediate language between the source language and the machine code the computer
+actually executes. The primary (and very important) difference lies in the fact that the translating between the source
+and the intermediate language is done at run-time instead of beforehand like a transpiler does. This has many benefits,
+the foremost being that more information is available at run-time than compile-time, so normally difficult translations
+become trivial. For example, in CPython, a Python interpreter which uses C as the intermediate, the duck typing that Python
+uses would be normally impossible to translate beforehand to C. However, by doing the translation at run-time, it becomes
+very easy through use of associative arrays (also known as hashmaps or dictionaries).
+
+The final type of compiler, a Just in Time compiler (JIT) is an intermediate between traditional compilers and interpreters.
+The bulk of translation happens at run-time like in an interpreter, but the translation is to machine code like in a compiler.
+A well written JIT can therefore leverage the speed of a traditional compiler, while also having the flexibility of semantics
+that an interpreted language enjoys. A poorly written JIT, however, will be very slow due to the long translation times from
+the source language to machine code. 
+
+# What This Series Does
+
+The different types of compilers fit neatly on a scale of the difficulty to code. Interpreters are fairly easy, and it
+is therefore easy to find tutorials on how to make one. Transpilers and traditional compilers are quite a bit more
+difficult than interpreters to create, and are therefore slightly harder to find information about. JIT's are very
+difficult to get working properly, and so are even harder to learn about. 
+
+This series aims to be a thorough exploration of how to code a traditional compiler (referred to hereafter just as a compiler). 
+To increase the learning we derive from this exercise, no tools beyond the standard library of our host language will be 
+used. This means that no parsing libraries will be used, nor any assembly-generation tools like LLVM. Although it is more 
+practical in real life to use such tools, the purpose of this series is learning, which will be necessarily held back 
+should shortcuts be used.
+
+Specifically, the compiler here will be written in Python, for two main reasons. One, Python is a very popular and comprehensible 
+programming language, so this series has a better chance of being understandable compared to Haskell or Rust. Second, 
+Python code tends to have a lot less boilerplate compared to something like C or Java, making reading and writing it much
+easier.
