@@ -38,8 +38,46 @@ body {
 }
 
 .bottom-bar {
-    height: 100px;
+    margin-top: 25px;
     background-color: var(--main-background-color);
+}
+
+.bottom-bar-content {
+    width: 45%;
+    margin: 0 auto;
+    border-top: 2px solid var(--border-color);
+    padding-top: 15px;
+    height: 50px;
+    background-color: var(--main-background-color);
+}
+
+.bottom-source-link {
+    margin: 0 auto;
+}
+
+.bottom-source-link a {
+    color: var(--text-color);
+    font-family: Roboto, sans-serif;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.bottom-source-link a:visited {
+    color: inherit;
+}
+
+.bottom-source-link a:hover {
+    color: var(--hover-color);
+}
+
+.bottom-source-link a::before {
+    display: inline-block;
+    line-height: 1;
+    vertical-align: middle;
+    content: "\27A4 ";
+    color: var(--text-color);
+    font-family: Roboto, sans-serif;
+    font-size: 10px;
 }
 
 .content {
