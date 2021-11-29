@@ -261,7 +261,8 @@ class Heading(Element):
         self.level = level
         self.heading = heading
 
-        self.id = f"heading-{article.next_number()}"
+        stripped = ''.join(c for c in self.heading if c.isalnum() or c == ' ')
+        self.id = stripped.lower().replace(' ','-')
 
     def render(self, templates: Templates, site: Site) -> str:
         return templates.load("template_heading").render(level=self.level, id=self.id, heading=self.heading)
