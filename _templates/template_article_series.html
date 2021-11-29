@@ -5,9 +5,20 @@
             {{ article.series_name }}
         </div>
         {% for series_article in series %}
-            <div class="left-bar-item">
-                <a class="left-bar-item-link" href="{{ series_article.link.as_posix() }}">{{ series_article.number }}. {{ series_article.article_name }}</a>
-            </div>
+            {% if series_article == article %}
+                <div class="left-bar-item">
+                    <a class="left-bar-item-link" href="#">{{ series_article.number }}. {{ series_article.article_name }}</a>
+                    {% for heading in article.headings %}
+                        <div class="left-bar-heading">
+                            <a href="#{{ heading.id }}"> {{ heading.heading }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="left-bar-item">
+                    <a class="left-bar-item-link" href="{{ series_article.link.as_posix() }}">{{ series_article.number }}. {{ series_article.article_name }}</a>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 {% endblock %}

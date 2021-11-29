@@ -1,3 +1,7 @@
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     margin: 0;
     --main-background-color: #ffffff;
@@ -81,6 +85,36 @@ body {
     color: var(--hover-color);
 }
 
+.left-bar-heading {
+    margin: 5px 0 5px 15px;
+    color: var(--text-color);
+    font-family: Roboto, sans-serif;
+    font-size: 15px;
+}
+
+.left-bar-heading a::before {
+    display: inline-block;
+    line-height: 1;
+    vertical-align: middle;
+    content: "\27A4 ";
+    color: var(--text-color);
+    font-family: Roboto, sans-serif;
+    font-size: 10px;
+}
+
+.left-bar-heading a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.left-bar-heading a:visited {
+    color: inherit;
+}
+
+.left-bar-heading a:hover {
+    color: var(--hover-color);
+}
+
 .main-content-container {
     width: 45%;
     margin: 0 auto;
@@ -115,6 +149,11 @@ body {
     font-family: Roboto, sans-serif;
     font-size: 25px;
     padding: 25px 0 5px;
+}
+
+.article-heading-anchor {
+    position: relative;
+    top: calc(-7vh + -20px);
 }
 
 .article-paragraph {

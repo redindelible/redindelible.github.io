@@ -85,16 +85,10 @@ class Site:
         self.all_series: dict[str, list[ArticleSeries]] = {}
         self.pages: list[Page] = []
 
-        self.counter: int = 0
-
     def add_page(self, page: Page):
         if isinstance(page, ArticleSeries):
             self.all_series.setdefault(page.series_name, []).append(page)
         self.pages.append(page)
-
-    def next_number(self) -> int:
-        self.counter += 1
-        return self.counter
 
     def render(self, templates: Templates, target: Path):
         for page in self.pages:
@@ -149,11 +143,14 @@ class Index(Page, register_name="index"):
 
 
 class Article(Page, register_name="article"):
-    def __init__(self, title: str, date: datetime, elements: list[Element]):
+    def __init__(self, title: str, date: datetime):
         super().__init__()
         self.title: str = title
         self.date: datetime = date
-        self.elements = elements
+        self.elements: list[Element] = []
+        self.headings: list[Heading] = []
+
+        self.counter = 0
 
     @property
     def link(self):
@@ -163,18 +160,21 @@ class Article(Page, register_name="article"):
     def _create(cls, metadata: dict, raw_text: str) -> Article:
         title = metadata["title"]
         date = datetime.strptime(metadata["date"], "%b %d, %Y")
-        elements = cls.parse_text(raw_text)
-        return Article(title, date, elements)
+        article = Article(title, date)
+        article.parse_text(raw_text)
+        return article
 
-    @staticmethod
-    def parse_text(text: str) -> list[Element]:
+    def next_number(self) -> int:
+        self.counter += 1
+        return self.counter
+
+    def parse_text(self, text: str):
         text = text.strip()
         i = 0
-        elements: list[Element] = []
         while i < len(text):
             if text.startswith("```", i):
                 if match := CodeBlock.code_block_pattern.match(text, i):
-                    elements.append(CodeBlock(match.group(1), match.group(2).strip()))
+                    self.elements.append(CodeBlock(self, match.group(1), match.group(2).strip()))
                     i = match.end()
                     while i < len(text) and text[i] in " \t\n\r":
                         i += 1
@@ -182,7 +182,9 @@ class Article(Page, register_name="article"):
                     raise Exception()
             elif text.startswith("#", i):
                 if match := Heading.heading_pattern.match(text, i):
-                    elements.append(Heading(len(match.group(1)), match.group(2).strip()))
+                    heading = Heading(self, len(match.group(1)), match.group(2).strip())
+                    self.elements.append(heading)
+                    self.headings.append(heading)
                     i = match.end()
                     while i < len(text) and text[i] in " \t\n\r":
                         i += 1
@@ -202,8 +204,7 @@ class Article(Page, register_name="article"):
                         break
                     else:
                         i += 1
-                elements.append(Paragraph(paragraph_text.replace("\n", " ")))
-        return elements
+                self.elements.append(Paragraph(self, paragraph_text.replace("\n", " ")))
 
     @property
     def preview(self) -> str:
@@ -218,8 +219,8 @@ class Article(Page, register_name="article"):
 
 
 class ArticleSeries(Article, register_name="article-series"):
-    def __init__(self, title: str, date: datetime, series_name: str, article_name: str, number: int, elements: list[Element]):
-        super().__init__(title, date, elements)
+    def __init__(self, title: str, date: datetime, series_name: str, article_name: str, number: int):
+        super().__init__(title, date)
         self.series_name: str = series_name
         self.article_name: str = article_name
         self.number = number
@@ -228,11 +229,12 @@ class ArticleSeries(Article, register_name="article-series"):
     def _create(cls, metadata: dict, raw_text: str) -> Article:
         title = metadata["title"]
         date = datetime.strptime(metadata["date"], "%b %d, %Y")
-        elements = cls.parse_text(raw_text)
         series_name = metadata["series"]["series_name"]
         article_name = metadata["series"]["article_name"]
         number = metadata["series"]["number"]
-        return ArticleSeries(title, date, series_name, article_name, number, elements)
+        article = ArticleSeries(title, date, series_name, article_name, number)
+        article.parse_text(raw_text)
+        return article
 
     @property
     def link(self):
@@ -244,6 +246,9 @@ class ArticleSeries(Article, register_name="article-series"):
 
 
 class Element:
+    def __init__(self, article: Article):
+        self.article = article
+
     def render(self, templates: Templates, site: Site) -> str:
         raise NotImplementedError()
 
@@ -251,12 +256,15 @@ class Element:
 class Heading(Element):
     heading_pattern = re.compile(r"(#)([^#\n]*)")
 
-    def __init__(self, level: int, heading: str):
+    def __init__(self, article: Article, level: int, heading: str):
+        super().__init__(article)
         self.level = level
         self.heading = heading
 
+        self.id = f"heading-{article.next_number()}"
+
     def render(self, templates: Templates, site: Site) -> str:
-        return templates.load("template_heading").render(level=self.level, heading=self.heading)
+        return templates.load("template_heading").render(level=self.level, id=self.id, heading=self.heading)
 
 
 class Paragraph(Element):
@@ -264,7 +272,8 @@ class Paragraph(Element):
     note_pattern = re.compile(r"(?<!\\)`@note (.*?)(?<!\\)`")
     inline_code_pattern = re.compile(r"(?<!\\)`(.*?)(?<!\\)`")
 
-    def __init__(self, raw_text: str):
+    def __init__(self, article: Article, raw_text: str):
+        super().__init__(article)
         self.raw_text = raw_text
 
     def __repr__(self):
@@ -273,7 +282,7 @@ class Paragraph(Element):
     def render(self, templates: Templates, site: Site) -> str:
         text = self.raw_text
         while match := self.note_pattern.search(text):
-            note = templates.load("template_note").render(number=site.next_number(), note=match.group(1))
+            note = templates.load("template_note").render(number=self.article.next_number(), note=match.group(1))
             text = text[:match.start()] + note + text[match.end():]
         while match := self.inline_code_pattern.search(text):
             code = templates.load("template_inline_code").render(code=match.group(1))
@@ -284,7 +293,8 @@ class Paragraph(Element):
 class CodeBlock(Element):
     code_block_pattern = re.compile(r"```(?:@(\S*))?((?:.|\s)*?)(?<!\\)```")
 
-    def __init__(self, file: str | None, raw_code: str):
+    def __init__(self, article: Article, file: str | None, raw_code: str):
+        super().__init__(article)
         self.file = file
         self.raw_code = raw_code
 
