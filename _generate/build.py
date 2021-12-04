@@ -154,7 +154,7 @@ class Article(Page, register_name="article"):
 
     @property
     def link(self):
-        return Path(f"/articles/{self.title[:20].strip().lower().replace(' ', '-')}-{self.date.strftime('%m-%d-%y')}.html")
+        return Path(f"/articles/{self.title[:20].strip().lower().replace(' ', '-')}.html")
 
     @classmethod
     def _create(cls, metadata: dict, raw_text: str) -> Article:
@@ -238,7 +238,7 @@ class ArticleSeries(Article, register_name="article-series"):
 
     @property
     def link(self):
-        return Path(f"/articles/{self.title[:20].strip().lower().replace(' ', '-')}-{self.number}-{self.date.strftime('%m-%d-%y')}.html")
+        return Path(f"/articles/{self.title[:20].strip().lower().replace(' ', '-')}-{self.number}-{self.article_name[:20].strip().lower().replace(' ', '-')}.html")
 
     def render(self, templates: Templates, site: Site) -> str:
         series = sorted(site.all_series[self.series_name], key=lambda art: art.number)
