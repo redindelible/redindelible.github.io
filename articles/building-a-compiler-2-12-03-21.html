@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>redindelible</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    <link rel='stylesheet' href='/style.css'>
+    <link rel="icon" href="/favicon.png">
+</head>
+<body>
+    <div class="top-bar">
+        <a class="top-title" href="/index.html">
+            <div>redindelible</div>
+        </a>
+    </div>
+
+    <div class="content">
+    <div class="left-bar">
+        <div class="left-bar-title">
+            Building a Compiler
+        </div>
+                <div class="left-bar-item">
+                    <a class="left-bar-item-link" href="/articles/building-a-compiler-1-12-02-21.html">1. Introduction</a>
+                </div>
+                <div class="left-bar-item">
+                    <a class="left-bar-item-link" href="#">2. Goals and Design</a>
+                        <div class="left-bar-heading">
+                            <a href="#goal-a-sliding-scale-down-to-c"> Goal: A Sliding Scale Down to C</a>
+                        </div>
+                        <div class="left-bar-heading">
+                            <a href="#goal-simplicity"> Goal: Simplicity</a>
+                        </div>
+                </div>
+    </div>
+        <div class="main-content-container">
+            <div class="main-content">
+    <div class="article-title">
+        Building a Compiler
+    </div>
+    <div class="article-subtitle">
+        Part 2 &ndash;  Goals and Design
+    </div>
+    <div class="article-date">
+        Published Dec 03, 2021
+    </div>
+        <div class="article-paragraph">The absolute first thing to do when setting out to write a compiler (or a programming language in general) is to lay out your goals precisely. Without set goals, the project will just grow in size until its no longer feasible. Ideally, those goals would be achievable for a project intended for daily use. More theoretical goals (most notably compile-time  memory safety) should be reserved for explicitly exploratory languages that focus on that on goal exclusively, unless  you're very sure of your design. In Swerve, I'll be primarily focused on the theoretical goal of mixing unsafe C-like code with much more safe code easily, and most other language features will be focused on that goal. </div>
+        <div class="article-heading-1">
+    <div class="article-heading-anchor" id="goal-a-sliding-scale-down-to-c"></div>
+    Goal: A Sliding Scale Down to C
+</div>
+        <div class="article-paragraph">The foremost goal of Swerve is being able to do anything you can do in C, if you want to. This ability should be  equally prioritized with the ability to write safe code. In doing so, we remain close to C's heritage of performance  while providing conveniences when they'd be useful.</div>
+        <div class="article-heading-1">
+    <div class="article-heading-anchor" id="goal-simplicity"></div>
+    Goal: Simplicity
+</div>
+        <div class="article-paragraph">Additionally, Swerve will be based around trying to remain as simple as possible. Subjectively, I feel that the simpler a language is, the more fulfilling it is to program in (of course, there are limits to this). The key to striking that balance is by focusing heavily on orthogonal design. Essentially, no feature will cover the same use case as another  feature, and these features will be highly combinable. Match-statements and function overloading, for example, are  non-orthogonal since both cover the case of doing something different depending on the type of a value. On the other hand, generics and match-statements are orthogonal, since they do completely different things and combine intuitively.</div>
+        <div class="article-paragraph">With these goals in mind, all language design decisions will be made.</div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom-bar">
+        <div class="bottom-bar-content">
+            <div class="bottom-source-link"><a href="https://github.com/redindelible/redindelible.github.io" target="_blank"> Code for this Website</a></div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+%{
+    "type": "article-series",
+    "title": "Building a Compiler",
+    "date": "Dec 3, 2021",
+    "series": {
+        "series_name": "Building a Compiler",
+        "article_name": "Goals and Design",
+        "number": 2
+    }
+}%
+
+
+The absolute first thing to do when setting out to write a compiler (or a programming language in general) is to lay
+out your goals precisely. Without set goals, the project will just grow in size until its no longer feasible. Ideally,
+those goals would be achievable for a project intended for daily use. More theoretical goals (most notably compile-time 
+memory safety) should be reserved for explicitly exploratory languages that focus on that on goal exclusively, unless 
+you're very sure of your design. In Swerve, I'll be primarily focused on the theoretical goal of mixing unsafe
+C-like code with much more safe code easily, and most other language features will be focused on that goal. 
+
+# Goal: A Sliding Scale Down to C
+
+The foremost goal of Swerve is being able to do anything you can do in C, if you want to. This ability should be 
+equally prioritized with the ability to write safe code. In doing so, we remain close to C's heritage of performance 
+while providing conveniences when they'd be useful.
+
+# Goal: Simplicity
+
+Additionally, Swerve will be based around trying to remain as simple as possible. Subjectively, I feel that
+the simpler a language is, the more fulfilling it is to program in (of course, there are limits to this). The key to striking
+that balance is by focusing heavily on orthogonal design. Essentially, no feature will cover the same use case as another 
+feature, and these features will be highly combinable. Match-statements and function overloading, for example, are 
+non-orthogonal since both cover the case of doing something different depending on the type of a value. On the other
+hand, generics and match-statements are orthogonal, since they do completely different things and combine intuitively.
+
+With these goals in mind, all language design decisions will be made.

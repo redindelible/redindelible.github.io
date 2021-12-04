@@ -1,20 +1,22 @@
 %{
     "type": "article-series",
-    "title": "How To Build a Compiler",
-    "date": "Nov 28, 2021",
+    "title": "Building a Compiler",
+    "date": "Dec 2, 2021",
     "series": {
-        "series_name": "How To Build a Compiler",
+        "series_name": "Building a Compiler",
         "article_name": "Introduction",
         "number": 1
     }
 }%
 
-This article is intended to be the first of a series of articles that will walk you through coding a
-compiler, and providing you with a thorough understanding of the functioning of that code. By the end,
-you will hopefully both have a functioning compiler on hand, and have knowledge of how to extend it
-with your own ideas.
+This series of articles is intended to be a kind of documentation of my design and implementation of a 
+new programming language. Hopefully, writing out my thoughts allows me to improve on them easier.
+Additionally, quite of few of the topics within programming language implementation are very hard to
+either learn about or to grasp. For example, the process of writing your own executable on Windows
+without using your own linker requires digging up articles from the 90's (Granted, this isn't something
+most people need to do, but it'd be nice to have this information readily available). 
 
-# What Is A Programming Language Anyways?
+# Programming Languages vs. Implementations
 
 First off, a few crucial distinction: A programming language is fundamentally distinct from an
 implementation of a programming language. A programming language is nothing more than a specification
@@ -29,7 +31,7 @@ defines Python better than its spec does. Other Python implementations, such as 
 because they cannot leverage the C Libraries like numpy which have been coded to rely on CPython implementation
 details. 
 
-On the other hand, C does very well in separating its specification and its implementation. A new C specification
+On the other hand, C does very well in separating its specification from its implementations. A new C specification
 comes out every once in a while (ANSI C, C99, C11, etc.), and every C implementation does its best to meet a 
 particular version of C's specification. GCC and Clang typically aim to implement everything in the latest version, 
 while MSVC was stuck on ANSI C for a very long time.  
@@ -37,18 +39,18 @@ while MSVC was stuck on ANSI C for a very long time.
 # The Compiler
 
 The options for implementing a programming language boil down to either making a custom chip which implements a 
-programming language, or translating code from that language down to Machine Code so that it can run on a general 
+programming language, or translating code from that language down to machine code so that it can run on a general 
 chip. Given that the first option is very difficult and inefficient, virtually everyone chooses to go for the
 second option, either directly or indirectly. Most C implementations take code written in C and translate that
-to your processor's Machine Code. Meanwhile, CPython translates Python to C, and then translates C to Machine 
+to your processor's machine code. Meanwhile, CPython translates Python to C, and then translates C to machine 
 code.`@note The actual order this happens in is the other way around. We'll get to interpreters shortly.`
 
-A compiler, in its most general sense, is a program which translates code from one programming language to another,
-and is therefore the most common way of implementing programming languages. Anyone who took the second path I mentioned
-above wrote a compiler. However, even though this definition of a compiler is nice and short, it isn't particularly 
-useful. A compiler which translates C to Machine Code is going to look very different from a compiler that translates
-Python to C. And even within translating Python to C, there are two very distinct ways to do so. Therefore, compilers
-are divided into 4 distinct types.  
+That translation step is what defines a compiler. A compiler, in its most general sense, is a program which translates 
+code from one programming language to another, and is therefore the most common way of implementing programming languages. 
+Anyone who took the second path I mentioned above wrote a compiler. However, even though this definition of a compiler 
+is nice and short, it isn't particularly useful. A compiler which translates C to Machine Code is going to look very 
+different from a compiler that translates Python to C. And even within translating Python to C, there are two very 
+distinct ways to do so in interpreters and transpilers. Therefore, compilers are divided into 4 distinct types.  
 
 # Types of Compilers
 
@@ -84,20 +86,15 @@ A well written JIT can therefore leverage the speed of a traditional compiler, w
 that an interpreted language enjoys. A poorly written JIT, however, will be very slow due to the long translation times from
 the source language to machine code. 
 
-# What This Series Does
+# Why I'll use a Traditional Compilers
 
 The different types of compilers fit neatly on a scale of the difficulty to code. Interpreters are fairly easy, and it
 is therefore easy to find tutorials on how to make one. Transpilers and traditional compilers are quite a bit more
 difficult than interpreters to create, and are therefore slightly harder to find information about. JIT's are very
-difficult to get working properly, and so are even harder to learn about. 
+difficult to get working properly, and so are even harder to learn about. I'll be making a traditional compiler,
+since they offer what I believe is the ideal trade-off between implementation complexity and language usability.
 
 This series aims to be a thorough exploration of how to code a traditional compiler (referred to hereafter just as a compiler). 
-To increase the learning we derive from this exercise, no tools beyond the standard library of our host language will be 
-used. This means that no parsing libraries will be used, nor any assembly-generation tools like LLVM. Although it is more 
-practical in real life to use such tools, the purpose of this series is learning, which will be necessarily held back 
-should shortcuts be used.
-
-Specifically, the compiler here will be written in Python, for two main reasons. One, Python is a very popular and comprehensible 
-programming language, so this series has a better chance of being understandable compared to Haskell or Rust. Second, 
-Python code tends to have a lot less boilerplate compared to something like C or Java, making reading and writing it much
-easier.
+Additionally, I'll use no tools beyond the most common functions of the standard library. This means that no parsing 
+libraries will be used, nor any assembly-generation tools like LLVM. I'll be writing the compiler in C, and developing
+a marginally better version of C. Finally, the name of the language I'll be implementing is 'Swerve'.
