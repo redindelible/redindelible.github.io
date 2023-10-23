@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>redindelible</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    <link rel='stylesheet' href='/style.css'>
+    <link rel="icon" href="/favicon.png">
+</head>
+<body>
+<div class="top-bar">
+    <a class="top-title" href="/index.html">
+        <div>redindelible</div>
+    </a>
+</div>
+
+<div class="content">
+    {% block left_bar %} {% endblock %}
+    <div class="main-content-container">
+        <div class="main-content">
+            {% block content %} {% endblock %}
+        </div>
+    </div>
+</div>
+<div class="bottom-bar">
+    <div class="bottom-bar-content">
+        <div class="bottom-source-link"><a href="https://github.com/redindelible/redindelible.github.io" target="_blank"> Code for this Website</a></div>
+    </div>
+</div>
+</body>
+</html>

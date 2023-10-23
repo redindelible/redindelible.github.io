@@ -1,0 +1,24 @@
+{% extends "template_base.html" %}
+{% block left_bar %}
+    <div class="left-bar">
+        <div class="left-bar-title">
+            {{ article.series_name }}
+        </div>
+        {% for series_article in series %}
+            <div class="left-bar-item">
+                <a class="left-bar-item-link" href="/{{ series_article.article_info.path }}">{{ series_article.number }}. {{ series_article.article_info.title }}</a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+{% block content %}
+    <div class="article-title">
+        {{ article.series_name }}
+    </div>
+    <div class="article-subtitle">
+        Part {{ article.number }} &ndash;  {{ article.title }}
+    </div>
+    <div class="article-date">
+        Published {{ article.date.format("%b %d, %Y") }}
+    </div>
+{% endblock %}}
