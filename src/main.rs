@@ -232,7 +232,7 @@ fn generate() {
     for item in fs::read_dir(OUTPUT_DIR).unwrap() {
         let p = item.unwrap().path();
         if p.is_dir() {
-            fs::remove_dir(p).unwrap();
+            fs::remove_dir_all(p).unwrap();
         } else {
             fs::remove_file(p).unwrap();
         }
