@@ -4,13 +4,13 @@
         <div class="article-card-container">
             <div class="article-card">
                 <div class="article-card-link">
-                    <a href="{{ article.path }}">{{ article.title }}</a>
+                    <a href="{{ article.path() }}">{{ article.title() }}</a>
                 </div>
                 <div class="article-card-info">
-                    {{ article.date.format("%b %d, %Y") }}
+                    {{ article.date().format("%b %d, %Y") }}
                 </div>
                 <div class="article-card-preview">
-                    {{ article.preview }}...
+                    {{ article.preview() }}...
                 </div>
             </div>
         </div>

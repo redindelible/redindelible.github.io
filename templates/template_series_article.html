@@ -6,7 +6,7 @@
         </div>
         {% for series_article in series %}
             <div class="left-bar-item">
-                <a class="left-bar-item-link" href="/{{ series_article.article_info.path }}">{{ series_article.number }}. {{ series_article.article_info.title }}</a>
+                <a class="left-bar-item-link" href="/{{ series_article.path() }}">{{ series_article.number() }}. {{ series_article.title() }}</a>
             </div>
         {% endfor %}
     </div>
