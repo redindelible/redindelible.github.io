@@ -13,6 +13,14 @@ struct Stream<I> where I: Iterator {
 impl<I> Stream<I> where I: Iterator {
     pub fn new(it: I) -> Self { Self { iter: it.fuse(), peeked: VecDeque::new() }}
 
+    pub fn check_done(&mut self) -> bool {
+        if self.peeked.is_empty() {
+            self.peek().is_none()
+        } else {
+            false
+        }
+    }
+
     pub fn peek(&mut self) -> Option<&I::Item> {
         self.peek_index(0)
     }
@@ -35,9 +43,30 @@ impl<I> Stream<I> where I: Iterator {
         }
         self.peek_index(n - 1);
         if n < self.peeked.len() {
-            &self.peeked.make_contiguous()[0..n]
+            &self.peeked.make_contiguous()[..n]
         } else {
-            &self.peeked.make_contiguous()[0..]
+            self.peeked.make_contiguous()
+        }
+    }
+
+    pub fn advance(&mut self, n: usize) -> usize {
+        for i in 0..n {
+            if self.next().is_none() {
+                return i;
+            }
+        }
+        return n;
+    }
+
+    pub fn next_vec(&mut self, n: usize) -> Vec<I::Item> {
+        if n == 0 {
+            return vec![];
+        }
+        self.peek_index(n - 1);
+        if n < self.peeked.len() {
+            self.peeked.drain(..n).collect()
+        } else {
+            self.peeked.drain(..).collect()
         }
     }
 }
@@ -45,6 +74,10 @@ impl<I> Stream<I> where I: Iterator {
 impl<I> Stream<I> where I: Iterator<Item=char> {
     pub fn peek_string(&mut self, len: usize) -> String {
         String::from_iter(self.peek_slice(len))
+    }
+
+    pub fn next_string(&mut self, len: usize) -> String {
+        String::from_iter(self.next_vec(len))
     }
 
     pub fn startswith(&mut self, chars: impl AsRef<str>) -> bool {
@@ -81,7 +114,11 @@ impl<I> ExactSizeIterator for Stream<I> where I: ExactSizeIterator { }
 fn parse(text: &str) {
     let mut text = Stream::new(text.chars());
 
-    text.peek_string(3) == "```";
+    while !text.check_done() {
+        if text.startswith("```") {
+            text.next_string(3);
+        }
+    }
 }
 
 
@@ -95,6 +132,7 @@ mod test {
         let mut s = Stream::new(v.into_iter());
         assert_eq!(s.peek(), Some(&1));
         assert_eq!(s.peek(), Some(&1));
+        assert!(!s.check_done());
         assert_eq!(s.peek_index(1), Some(&2));
         assert_eq!(s.peek_index(1), Some(&2));
         assert_eq!(s.peek_index(0), Some(&1));
@@ -107,7 +145,9 @@ mod test {
         assert_eq!(s.next(), Some(4));
         assert_eq!(s.peek_index(0), Some(&5));
         assert_eq!(s.peek_index(1), None);
+        assert!(!s.check_done());
         assert_eq!(s.next(), Some(5));
+        assert!(s.check_done());
         assert_eq!(s.next(), None);
         assert_eq!(s.peek_index(0), None);
         assert_eq!(s.peek_index(1), None);
