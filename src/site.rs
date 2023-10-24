@@ -3,9 +3,7 @@ use std::rc::Rc;
 use std::path::Path;
 use std::fs;
 
-use crate::page::{generate_mdx, Page};
-use crate::page::IsArticle;
-use crate::page::IsSeriesArticle;
+use crate::page::{generate_mdx, Page, IsArticle, IsSeriesArticle};
 
 
 pub struct Site {

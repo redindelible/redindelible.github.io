@@ -4,6 +4,7 @@ mod link;
 mod site;
 mod page;
 mod index;
+mod mdx;
 
 use std::path::Path;
 use std::fs;
@@ -48,16 +49,15 @@ impl Generator {
 
         site.render_pages(Path::new(OUTPUT_DIR));
     }
+
+    pub fn generate() {
+        Generator::clear_directory(OUTPUT_DIR);
+
+        Generator::generate_directory(SITE_DIR, OUTPUT_DIR);
+    }
 }
 
-
-
-fn generate() {
-    Generator::clear_directory(OUTPUT_DIR);
-
-    Generator::generate_directory(SITE_DIR, OUTPUT_DIR);
-}
 
 fn main() {
-    generate();
+    Generator::generate();
 }
