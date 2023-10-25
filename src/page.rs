@@ -11,7 +11,7 @@ use crate::series_article::SeriesArticle;
 use crate::site::Site;
 
 pub trait Page {
-    fn from_metadata(metadata: JSONValue) -> Option<Self> where Self: Sized;
+    fn from_metadata(metadata: JSONValue, text: &str) -> Option<Self> where Self: Sized;
     fn add_to_site(self: Box<Self>, site: &mut Site);
 
     fn path(&self) -> Link;
@@ -45,10 +45,10 @@ pub fn generate_mdx(path: impl AsRef<Path>) -> Box<dyn Page> {
     let typ = json.get("type").unwrap().as_str().unwrap();
     match typ {
         "index" => {
-            Box::new(Index::from_metadata(json).unwrap())
+            Box::new(Index::from_metadata(json, rest).unwrap())
         }
-        "article" => {
-            Box::new(SeriesArticle::from_metadata(json).unwrap())
+        "series-article" => {
+            Box::new(SeriesArticle::from_metadata(json, rest).unwrap())
         }
         _ => { panic!("{}", typ); }
     }

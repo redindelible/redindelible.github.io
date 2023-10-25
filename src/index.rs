@@ -14,7 +14,7 @@ struct IndexTemplate<'a> {
 pub struct Index;
 
 impl Page for Index {
-    fn from_metadata(_metadata: JSONValue) -> Option<Self> where Self: Sized {
+    fn from_metadata(_metadata: JSONValue, _text: &str) -> Option<Self> where Self: Sized {
         Some(Index)
     }
 

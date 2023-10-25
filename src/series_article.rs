@@ -3,6 +3,7 @@ use chrono::NaiveDate;
 use askama::Template;
 
 use crate::link::Link;
+use crate::mdx::{CodeBlock, Heading, MDXFile, Paragraph, Parser};
 use crate::page::{IsArticle, IsSeriesArticle};
 use crate::page::Page;
 use crate::site::Site;
@@ -21,6 +22,8 @@ pub struct SeriesArticle {
     title: String,
     date: NaiveDate,
     preview: String,
+
+    elements: MDXFile
 }
 
 fn first_n(s: &str, n: usize) -> String {
@@ -28,13 +31,20 @@ fn first_n(s: &str, n: usize) -> String {
 }
 
 impl Page for SeriesArticle {
-    fn from_metadata(metadata: JSONValue) -> Option<Self> where Self: Sized {
+    fn from_metadata(metadata: JSONValue, text: &str) -> Option<Self> where Self: Sized {
         let title = metadata.get("title")?.as_str()?.to_string();
         let date = NaiveDate::parse_from_str(metadata.get("date")?.as_str()?, "%b %d, %Y").unwrap();
         let data = metadata.get("series")?;
         let series_name = data.get("series_name")?.as_str()?.to_string();
         let number = data.get("number")?.as_u64()? as u32;
-        Some(SeriesArticle { series_name, number, title, date, preview: "".to_string() })
+
+        let elements= Parser::new()
+            .add_element::<CodeBlock>()
+            .add_element::<Heading>()
+            .add_element::<Paragraph>()
+            .parse(text);
+        dbg!(&elements);
+        Some(SeriesArticle { series_name, number, title, date, preview: "".to_string(), elements })
     }
 
     fn add_to_site(self: Box<Self>, site: &mut Site) {
