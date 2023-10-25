@@ -1,0 +1,8 @@
+<div class="article-codeblock">
+    {% match source %}
+        {% when Some with (file) %}
+            <div class="article-codeblock-source">in {{ file }}</div>
+        {% when None %}
+    {% endmatch %}
+    <div class="article-codeblock-code">{{ code }}</div>
+</div>

@@ -9,7 +9,7 @@ use crate::page::Page;
 use crate::site::Site;
 
 #[derive(Template)]
-#[template(path="template_series_article.html")]
+#[template(path="template_series_article.html", escape="none")]
 struct SeriesArticleTemplate<'a> {
     article: &'a SeriesArticle,
     series: Vec<&'a dyn IsSeriesArticle>

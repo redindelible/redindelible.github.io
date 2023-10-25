@@ -1,9 +1,12 @@
 use std::fmt::{Debug, Display};
+use askama::Template;
 use regex::{Captures, Regex};
 
 pub trait Element : Debug {
     fn pattern() -> Regex where Self: Sized;
     fn create(captures: Captures) -> Self where Self: Sized;
+
+    fn render(&self) -> String;
 }
 
 
@@ -12,9 +15,21 @@ pub struct MDXFile {
     elements: Vec<Box<dyn Element>>
 }
 
+impl MDXFile {
+    pub fn render(&self) -> String {
+        let mut s = String::new();
+        for elem in &self.elements {
+            s.push_str(&elem.render());
+        }
+        s
+    }
+}
 
-#[derive(Debug)]
+
+#[derive(Debug, Template)]
+#[template(path="template_code_block.html")]
 pub struct CodeBlock {
+    source: Option<String>,
     code: String
 }
 
@@ -25,13 +40,19 @@ impl Element for CodeBlock {
 
     fn create(captures: Captures) -> Self {
         let (_, [code]) = captures.extract();
-        CodeBlock { code: code.to_string() }
+        CodeBlock { source: None, code: code.to_string() }
+    }
+
+    fn render(&self) -> String {
+        Template::render(self).unwrap()
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug,Template)]
+#[template(path="template_heading.html")]
 pub struct Heading {
-    heading_level: usize,
+    level: usize,
+    id: String,
     heading: String
 }
 
@@ -42,11 +63,23 @@ impl Element for Heading {
 
     fn create(captures: Captures) -> Self where Self: Sized {
         let (_, [level, heading]) = captures.extract();
-        Heading { heading_level: level.len(), heading: heading.to_string() }
+        let id: String = heading.chars().filter_map(|c| {
+            match c {
+                c if c.is_alphanumeric() => Some(c),
+                c if c.is_whitespace() => Some('-'),
+                _ => None
+            }
+        }).collect();
+        Heading { level: level.len(), heading: heading.to_string(), id }
+    }
+
+    fn render(&self) -> String {
+        Template::render(self).unwrap()
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Template)]
+#[template(path="template_paragraph.html")]
 pub struct Paragraph {
     text: String
 }
@@ -59,6 +92,10 @@ impl Element for Paragraph {
     fn create(captures: Captures) -> Self where Self: Sized {
         let (text, []) = captures.extract();
         Paragraph { text: text.replace("\n", " ") }
+    }
+
+    fn render(&self) -> String {
+        Template::render(self).unwrap()
     }
 }
 
