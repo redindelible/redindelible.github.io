@@ -3,7 +3,7 @@ use chrono::NaiveDate;
 use askama::Template;
 
 use crate::link::Link;
-use crate::mdx::{CodeBlock, Heading, MDXFile, Paragraph, Parser};
+use crate::mdx::{CodeBlock, Heading, MDXFile, Note, Paragraph, Parser};
 use crate::page::{IsArticle, IsSeriesArticle};
 use crate::page::Page;
 use crate::site::Site;
@@ -42,8 +42,8 @@ impl Page for SeriesArticle {
             .add_element::<CodeBlock>()
             .add_element::<Heading>()
             .add_element::<Paragraph>()
+            .add_inline::<Note>()
             .parse(text);
-        dbg!(&elements);
         Some(SeriesArticle { series_name, number, title, date, preview: "".to_string(), elements })
     }
 
