@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>redindelible</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    <link rel='stylesheet' href='/style.css'>
+    <link rel="icon" href="/favicon.png">
+</head>
+<body>
+<div class="top-bar">
+    <a class="top-title" href="/index.html">
+        <div>redindelible</div>
+    </a>
+</div>
+
+<div class="content">
+    
+    <div class="left-bar">
+        <div class="left-bar-title">
+            Building a Compiler
+        </div>
+        
+            <div class="left-bar-item">
+                <a class="left-bar-item-link" href="/articles/preliminary-notes.html">1. Preliminary Notes</a>
+            </div>
+        
+            <div class="left-bar-item">
+                <a class="left-bar-item-link" href="/articles/introduction.html">3. Introduction</a>
+            </div>
+        
+            <div class="left-bar-item">
+                <a class="left-bar-item-link" href="/articles/goals-and-design.html">2. Goals and Design</a>
+            </div>
+        
+    </div>
+
+    <div class="main-content-container">
+        <div class="main-content">
+            
+    <div class="article-title">
+        Building a Compiler
+    </div>
+    <div class="article-subtitle">
+        Part 1 &ndash;  Preliminary Notes
+    </div>
+    <div class="article-date">
+        Published Nov 01, 2023
+    </div>
+
+    <div class="article-paragraph">(NOTE: this is a work in progress)</div><div class="article-paragraph">This is meant to be an exploration into the slightly more complicated parts of writing a compiler that are typically glossed over by guides on writing a programming language. I'm writing this with the expectation that you know a bit about compilers already, such as what an AST is or the general concept of parsers. In this series, we will be implementing Aize, a language I created for this explicit purpose:</div><div class="article-codeblock">
+    
+    
+    <div class="article-codeblock-code">
+fn fibonacci(n: i32) -&gt; i32 {
+    if (n &lt; 2) {
+        return n;    
+    } else {
+        return fibonacci(n - 1) + fibonacci(n - 2);    
+    }
+}
+
+fn main() -&gt; i32 {
+    return fibonacci(12);
+}
+</div>
+</div><div class="article-heading-1">
+    <div class="article-heading-anchor" id="Why-Rust"></div>
+    Why Rust?
+</div><div class="article-paragraph">The code in this series will all be in Rust. Rust has a few properties which I find are very helpful when implementing a language. For one, it's statically typed, which makes many classes errors either impossible or easy to spot. It also has tagged unions (called enums in Rust), which are very helpful when representing ASTs. Finally, I just like writing in it more than any other language available right now.</div>
+
+        </div>
+    </div>
+</div>
+<div class="bottom-bar">
+    <div class="bottom-bar-content">
+        <div class="bottom-source-link"><a href="https://github.com/redindelible/redindelible.github.io" target="_blank"> Code for this Website</a></div>
+    </div>
+</div>
+</body>
+</html>

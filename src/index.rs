@@ -28,7 +28,7 @@ impl Page for Index {
 
     fn render(&self, site: &Site) -> String {
         let mut articles: Vec<&dyn IsArticle> = site.articles().map(|p| p.as_ref()).collect();
-        articles.sort_by_key(|article| article.date());
+        articles.sort_unstable_by_key(|article| std::cmp::Reverse(article.date()));
         IndexTemplate { articles }.render().unwrap()
     }
 }

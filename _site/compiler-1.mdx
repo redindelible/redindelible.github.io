@@ -1,0 +1,38 @@
+%{
+    "type": "series-article",
+    "title": "Preliminary Notes",
+    "date": "Nov 1, 2023",
+    "series": {
+        "series_name": "Building a Compiler",
+        "number": 1
+    }
+}%
+
+(NOTE: this is a work in progress)
+
+This is meant to be an exploration into the slightly more complicated parts of writing a compiler
+that are typically glossed over by guides on writing a programming language. I'm writing this with
+the expectation that you know a bit about compilers already, such as what an AST is or the general
+concept of parsers. In this series, we will be implementing Aize, a language I created for this
+explicit purpose:
+
+```
+fn fibonacci(n: i32) -> i32 {
+    if (n < 2) {
+        return n;    
+    } else {
+        return fibonacci(n - 1) + fibonacci(n - 2);    
+    }
+}
+
+fn main() -> i32 {
+    return fibonacci(12);
+}
+```
+
+# Why Rust?
+
+The code in this series will all be in Rust. Rust has a few properties which I find are very helpful when
+implementing a language. For one, it's statically typed, which makes many classes errors either impossible
+or easy to spot. It also has tagged unions (called enums in Rust), which are very helpful when representing
+ASTs. Finally, I just like writing in it more than any other language available right now.
